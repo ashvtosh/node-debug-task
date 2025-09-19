@@ -1,0 +1,45 @@
+id: nodejs-debug-task
+title: Fix a broken Node.js terminal-first microservice
+context: |
+  A tiny Node.js HTTP service is provided. The service must start and correctly serve
+  a few endpoints used by downstream processes. The current baseline is broken
+  (runtime crash when /greet is requested) and must be fixed using only files inside
+  the task folder.
+
+objectives:
+  - Make the service start reliably.
+  - Ensure /health returns HTTP 200 and "OK".
+  - Ensure /greet returns JSON {"greeting": "Hello, <Name>!"} when given name query param.
+  - Ensure /greet falls back to the default name from the config when no query param.
+  - Support overriding the config file path with CONFIG_PATH env var.
+  - The tests must pass via ./run-tests.sh.
+
+constraints:
+  - Allowed tools: node (>=18), bash, sed/awk, jq optional, python3 (for tests)
+  - No network access required at runtime (server uses only Node built-ins).
+  - Max agent timeout: 300 seconds
+  - Max test timeout: 120 seconds
+
+acceptance_criteria:
+  - Server process starts and listens on the configured port.
+  - GET /health returns 200 with body "OK".
+  - GET /greet?name=Alice returns JSON with greeting "Hello, Alice!".
+  - GET /greet (no name) returns JSON greeting using the default name from the config.
+  - Setting CONFIG_PATH to another config file changes the default name accordingly.
+  - run-tests.sh returns exit code 0 (all tests pass).
+
+inputs:
+  - server.js (baseline runtime file — contains bug)
+  - config.json (default config)
+  - config.alt.json (alternate config used in tests)
+  - package.json (start script)
+  - tests/test_outputs.py (pytests that validate acceptance criteria)
+
+outputs:
+  - A server that responds correctly to the endpoints above.
+  - run-tests.sh exit code 0 on success.
+
+notes: |
+  The tests are deterministic and use local requests only. The solver must not require
+  network access. The solution/oracle is provided in solution.sh (for graders), but
+  it must not be executed by tests or incorporated into runtime Docker images.

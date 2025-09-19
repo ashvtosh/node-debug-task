@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-debug-task",
+  "version": "1.0.0",
+  "description": "Small Node service for debugging task",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
